@@ -1,0 +1,752 @@
+/* Global resets and fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+:root {
+  --primary-purple: #a435f0;
+  --text-black: #2d2f31;
+  --text-gray: #6a6f73;
+  --star-yellow: #e59819;
+  --premium-bg: #a435f0;
+  --bestseller-bg: #eceb98;
+  /* Fallback */
+  --bestseller-bg-real: #c0fbfd;
+  /* Closer to screenshot */
+  --bestseller-text: #1e605e;
+  --price-black: #2d2f31;
+  --bg-white: #ffffff;
+  --body-bg: #ffffff;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  /* Close to Udemy's font */
+  background-color: var(--body-bg);
+  color: var(--text-black);
+}
+
+.app-container {
+  max-width: 100%;
+}
+
+/* Navbar (Keep existing mostly, maybe tweak) */
+.navbar {
+  border-bottom: 1px solid #d1d7dc;
+  padding: 0 2.4rem;
+}
+
+/* Main Layout */
+.main-container {
+  max-width: 134rem;
+  margin: 0 auto;
+  padding: 3.2rem 2.4rem;
+}
+
+/* "What to learn next" Section */
+.section-header-group {
+  margin-bottom: 1.6rem;
+}
+
+.section-header-group h2 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02rem;
+  margin-bottom: 1.6rem;
+  color: var(--text-black);
+}
+
+.section-header-group h3 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin-bottom: 2.4rem;
+  color: var(--text-black);
+}
+
+/* Continue Learning Card (Big Card) */
+.continue-learning-card {
+  display: flex;
+  border: 1px solid #d1d7dc;
+  background: #fff;
+  padding: 0;
+  margin-bottom: 4.8rem;
+  /* max-width: 600px; Remove max-width to let it fit content naturally or specific size */
+  width: fit-content;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.continue-learning-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.cl-thumbnail {
+  width: 260px;
+  height: 145px;
+  background-color: #2d2f31;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cl-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-circle {
+  background: #fff;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 4px;
+  /* Optical center for triangle */
+}
+
+.cl-info {
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 400px;
+}
+
+.cl-course-title {
+  font-size: 1.6rem;
+  /* Match screenshot similar size */
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 0.8rem;
+}
+
+.cl-lecture-title {
+  font-size: 1.4rem;
+  font-weight: 400;
+  /* Regular */
+  margin-bottom: 0.8rem;
+  display: block;
+}
+
+.cl-meta {
+  font-size: 1.2rem;
+  color: var(--text-gray);
+}
+
+/* Course Carousel / Grid Container */
+.course-carousel {
+  display: flex;
+  gap: 1.6rem;
+  overflow-x: auto;
+  padding-bottom: 2rem;
+  /* Space for scrollbar or shadow */
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.course-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual Course Card */
+.course-card-new {
+  min-width: 266px;
+  /* Typical Udemy card width */
+  max-width: 266px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  background: transparent;
+}
+
+.cc-thumbnail {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-color: #1c1d1f;
+  margin-bottom: 0.8rem;
+  position: relative;
+  border: 1px solid #d1d7dc;
+}
+
+/* If we have real images */
+.cc-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Placeholder style if no image */
+.cc-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.cc-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cc-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-black);
+
+  /* Truncate to 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 3.8rem;
+  /* approx 2 lines */
+}
+
+.cc-instructor {
+  font-size: 1.2rem;
+  color: var(--text-gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cc-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.rating-number {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #b4690e;
+  /* Darker yellow/brown text */
+}
+
+.rating-stars {
+  display: flex;
+  align-items: center;
+}
+
+.star-icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: var(--star-yellow);
+  color: var(--star-yellow);
+}
+
+.rating-count {
+  font-size: 1.2rem;
+  color: var(--text-gray);
+}
+
+.cc-price-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.current-price {
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: var(--price-black);
+}
+
+.original-price {
+  font-size: 1.4rem;
+  color: var(--text-gray);
+  text-decoration: line-through;
+}
+
+.cc-badges {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.badge {
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.4rem;
+  /* Specific rounded/sharp edges */
+  line-height: 1;
+}
+
+.badge-premium {
+  background-color: #a435f0;
+  /* Purple */
+  color: white;
+  background-color: #f3e8fc;
+  /* Light purple usually, but screenshot shows dark purple bg with white text? */
+  /* Screenshot: Deep purple background, White text. Text says "Premium" */
+  background: #6a25c5;
+  color: #fff;
+  border-radius: 2px;
+}
+
+.badge-bestseller {
+  background-color: #c0fbfd;
+  /* Light cyan */
+  color: #1e605e;
+  /* Dark teal */
+  border-radius: 2px;
+}
+
+/* Nav Button in Carousel */
+.carousel-nav-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4.8rem;
+  height: 4.8rem;
+  border-radius: 50%;
+  background: #1c1d1f;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+  border: 1px solid white;
+}
+
+.carousel-wrapper {
+  position: relative;
+  /* padding-right: 2rem; */
+}
+
+/* Utility to ensure base font size scaling if needed, 1.6rem = 16px usually */
+html {
+  font-size: 62.5%;
+  /* 10px base */
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: white;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  padding: 1.6rem;
+  border-bottom: 1px solid #d1d7dc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+}
+
+.modal-body {
+  padding: 2.4rem;
+}
+
+.btn-primary {
+  background-color: #a435f0;
+  color: white;
+  border: none;
+  padding: 1.2rem 2.4rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #8710d8;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #2d2f31;
+  border: 1px solid transparent;
+  padding: 1.2rem 2.4rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Modern Player Layout - Udemy Clone Exact */
+.player-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: 'Udemy Sans', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+/* Dark Header */
+.player-header {
+  background-color: #1c1d1f;
+  color: #ffffff;
+  height: 5.6rem;
+  display: flex;
+  align-items: center;
+  padding: 0 1.6rem;
+  justify-content: space-between;
+  border-bottom: 1px solid #3e4143;
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.player-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  flex: 1;
+}
+
+.player-header-title {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 600px;
+  border-left: 1px solid #3e4143;
+  padding-left: 1.6rem;
+  line-height: 1.2;
+}
+
+.player-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.header-btn-dark {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  /* Button border default white in Udemy player */
+  padding: 0 1.2rem;
+  height: 3.4rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  white-space: nowrap;
+}
+
+.header-btn-dark:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.header-icon-btn {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  cursor: pointer;
+  padding: 0;
+  width: 3.4rem;
+  height: 3.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Main Content Area */
+.player-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Left Side: Video + Tabs */
+.video-container-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+.video-frame {
+  background-color: #000;
+  width: 100%;
+  aspect-ratio: 16/9;
+  /* Standard video ratio */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.video-frame video {
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+
+/* Info Tabs below video */
+.info-tabs-container {
+  border-bottom: 1px solid #d1d7dc;
+  margin-top: 2.4rem;
+  padding: 0 2.4rem;
+}
+
+.info-tabs {
+  display: flex;
+  gap: 2.4rem;
+}
+
+.info-tab {
+  padding: 0.8rem 0.4rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #6a6f73;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  /* Align with border */
+}
+
+.info-tab.active {
+  color: #2d2f31;
+  border-bottom: 2px solid #2d2f31;
+}
+
+.course-info-content {
+  padding: 3.2rem;
+  max-width: 100rem;
+}
+
+.course-big-title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 1.6rem;
+  color: #2d2f31;
+  line-height: 1.2;
+}
+
+.course-stats-row {
+  display: flex;
+  gap: 1.6rem;
+  font-size: 1.4rem;
+  align-items: center;
+  margin-bottom: 2.4rem;
+}
+
+.rating-pill {
+  font-weight: 700;
+  color: #b4690e;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.rating-stars svg {
+  fill: #b4690e;
+  stroke: #b4690e;
+}
+
+/* Right Sidebar */
+.course-sidebar-right {
+  width: 40rem;
+  background-color: #fff;
+  border-left: 1px solid #d1d7dc;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid #d1d7dc;
+  align-items: center;
+  background: white;
+  padding: 0 0.8rem;
+}
+
+.sidebar-tab {
+  padding: 1.6rem;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #6a6f73;
+  cursor: pointer;
+  background-color: transparent;
+  border-bottom: 4px solid transparent;
+}
+
+.sidebar-tab.active {
+  color: #2d2f31;
+  border-bottom: 4px solid #2d2f31;
+  /* Active indicator */
+}
+
+
+/* File Tree in Sidebar */
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Section Header */
+.section-container {
+  border-bottom: 1px solid #d1d7dc;
+}
+
+.section-header {
+  background-color: #f7f9fa;
+  padding: 1.2rem 1.6rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.section-title-text {
+  font-size: 1.4rem;
+  /* Adjusted size */
+  color: #2d2f31;
+  display: block;
+}
+
+
+.section-items {
+  background-color: #fff;
+  padding-left: 1.6rem;
+  /* Indent nested content */
+}
+
+/* Lesson Item */
+.lesson-item {
+  display: flex;
+  padding: 0.8rem 1.6rem;
+  /* Tighter padding like screenshot */
+  cursor: pointer;
+  align-items: flex-start;
+  gap: 1.2rem;
+  background-color: #fff;
+  min-height: 4.8rem;
+  /* Touch target size */
+}
+
+.lesson-item:hover {
+  background-color: #e6f2f5;
+}
+
+.lesson-item.active {
+  background-color: #e6f2f5;
+  border-left: 4px solid transparent;
+  /* Placeholder to match selection style if needed */
+}
+
+/* Fake Checkbox */
+.lesson-checkbox {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+  color: #2d2f31;
+  /* Dark border color */
+}
+
+.lesson-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.lesson-title {
+  font-size: 1.4rem;
+  color: #2d2f31;
+  line-height: 1.4;
+  margin-bottom: 0.4rem;
+}
+
+.lesson-meta {
+  font-size: 1.2rem;
+  color: #6a6f73;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+
+/* Video Icon small */
+.video-icon-small {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
