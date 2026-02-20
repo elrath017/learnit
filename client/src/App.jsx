@@ -220,7 +220,7 @@ function App() {
       <nav className="navbar">
         {/* Reuse previous logic or simplify for "LearnIt" look */}
         <div style={{ display: 'flex', alignItems: 'center', height: '7.2rem', gap: '2rem' }}>
-          <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#2d2f31', fontFamily: 'sans-serif' }}>LearnIt</div>
+          <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#2d2f31', fontFamily: 'sans-serif', border: '2px solid #a435f0', padding: '0.2rem 0.6rem', borderRadius: '4px' }}>Learn<span style={{ color: '#a435f0' }}>It</span></div>
           <div className="search-bar" style={{ flex: 1, maxWidth: '60rem', border: '1px solid #1c1d1f', borderRadius: '4rem', height: '4.8rem', display: 'flex', alignItems: 'center', padding: '0 1.6rem', gap: '1rem', background: '#f7f9fa' }}>
             <Search size={20} color="#6a6f73" />
             <input placeholder="Search for anything" style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '1.4rem', outline: 'none' }} />
@@ -725,7 +725,7 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
       {/* Dark Header */}
       <header className="player-header">
         <div className="player-header-left">
-          <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#fff', cursor: 'pointer', fontFamily: 'sans-serif' }} onClick={onBack}>LearnIt</div>
+          <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#fff', cursor: 'pointer', fontFamily: 'sans-serif', border: '2px solid #a435f0', padding: '0.2rem 0.6rem', borderRadius: '4px' }} onClick={onBack}>Learn<span style={{ color: '#a435f0' }}>It</span></div>
           <div className="player-header-title">
             {course.name}
           </div>
