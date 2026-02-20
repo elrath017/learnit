@@ -5,6 +5,10 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 const ffmpeg = require('fluent-ffmpeg');
+const ffprobeStatic = require('ffprobe-static');
+
+// Configure fluent-ffmpeg to use the static binary
+ffmpeg.setFfprobePath(ffprobeStatic.path);
 
 const app = express();
 const PORT = 3001;

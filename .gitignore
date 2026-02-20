@@ -1,6 +1,9 @@
-node_modules
-dist
+node_modules/
+dist/
 .env
-courses
+courses/
 .DS_Store
 Thumbs.db
+server/config.json
+*.ps1
+launch.bat
