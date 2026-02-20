@@ -83,7 +83,13 @@ function App() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [currentVideo, setCurrentVideo] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [lastWatched, setLastWatched] = useState(null);
+  const [lastWatched, setLastWatched] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('lastWatched') || 'null');
+    } catch {
+      return null;
+    }
+  });
   const [showSettings, setShowSettings] = useState(false);
   const [rootDir, setRootDir] = useState(() => localStorage.getItem('udemy_clone_root_path') || 'E:\\Rahul\\Courses');
   const [pathHistory, setPathHistory] = useState(() => {
@@ -96,7 +102,7 @@ function App() {
 
   // Fetch courses helper
   const fetchCourses = () => {
-    fetch(`${API_URL}/courses`)
+    return fetch(`${API_URL}/courses`)
       .then(res => res.json())
       .then(data => {
         // Hydrate data with mock metadata
@@ -105,9 +111,39 @@ function App() {
           ...getCourseMetadata(c.name)
         }));
         setCourses(enriched);
+        return enriched;
       })
       .catch(err => console.error('Error fetching courses:', err));
   };
+
+  // Initial load
+  useEffect(() => {
+    fetch(`${API_URL}/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: rootDir })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          fetchCourses().then((enriched) => {
+            if (enriched && lastWatched) {
+              const course = enriched.find(c => c.name === lastWatched.courseName);
+              if (course) {
+                setSelectedCourse(course);
+                setCurrentVideo({
+                  name: lastWatched.videoName,
+                  path: lastWatched.videoPath
+                });
+              }
+            }
+          });
+        } else {
+          console.error("Default path invalid or not found:", data.error);
+        }
+      })
+      .catch(err => console.error("Failed to set initial config", err));
+  }, []);
 
   const handleBrowse = () => {
     fetch(`${API_URL}/browse`)
@@ -231,6 +267,31 @@ function App() {
                     <FolderOpen size={16} /> Browse
                   </button>
                 </div>
+
+                {pathHistory.length > 0 && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <p style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.4rem', color: '#2d2f31' }}>Recent Paths:</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem' }}>
+                      {pathHistory.map((path, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => setRootDir(path)}
+                          style={{
+                            padding: '0.4rem 0.8rem',
+                            background: '#f7f9fa',
+                            border: '1px solid #d1d7dc',
+                            borderRadius: '4px',
+                            fontSize: '1.2rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {path}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <p style={{ fontSize: '1.2rem', color: '#6a6f73', marginTop: '0.8rem' }}>
                   Paste the absolute path to your courses folder.
                   The folder should contain subfolders for each course.
@@ -250,13 +311,13 @@ function App() {
           <div className="section-header-group">
             <h2>What to learn next</h2>
             <div className="continue-learning-card" onClick={() => {
-              // Logic to resume specific course
-              // For now, find the course and open it
               const course = courses.find(c => c.name === lastWatched.courseName);
               if (course) {
                 setSelectedCourse(course);
-                // We should ideally find the specific video object
-                // For simplicity, we just open the course, logic to find video can be added
+                setCurrentVideo({
+                  name: lastWatched.videoName,
+                  path: lastWatched.videoPath
+                });
               }
             }}>
               <div className="cl-thumbnail" style={{ background: '#2d2f31' }}>
@@ -566,7 +627,18 @@ const advancedSort = (a, b) => {
 const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, sidebarOpen, setSidebarOpen }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedFolders, setExpandedFolders] = useState({});
-  const [completedVideos, setCompletedVideos] = useState(new Set());
+  const [completedVideos, setCompletedVideos] = useState(() => {
+    try {
+      const stored = localStorage.getItem('udemy_clone_completed_videos');
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('udemy_clone_completed_videos', JSON.stringify([...completedVideos]));
+  }, [completedVideos]);
   const [showNextOverlay, setShowNextOverlay] = useState(false);
   const [flatPlaylist, setFlatPlaylist] = useState([]);
 
