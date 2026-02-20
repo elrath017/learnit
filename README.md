@@ -1,6 +1,6 @@
-# Udemy-like Course Viewer
+# LearnIt Course Viewer
 
-A local React application to browse and watch video courses organized in nested folders, mimicking the Udemy UI and continuous playback experience. 
+A local React application to browse and watch video courses organized in nested folders, mimicking the LearnIt UI and continuous playback experience. 
 
 ## Features
 

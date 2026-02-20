@@ -19,7 +19,7 @@
 
 body {
   font-family: 'Roboto', sans-serif;
-  /* Close to Udemy's font */
+  /* Close to LearnIt's font */
   background-color: var(--body-bg);
   color: var(--text-black);
 }
@@ -163,7 +163,7 @@ body {
 /* Individual Course Card */
 .course-card-new {
   min-width: 266px;
-  /* Typical Udemy card width */
+  /* Typical LearnIt card width */
   max-width: 266px;
   display: flex;
   flex-direction: column;
@@ -430,12 +430,12 @@ html {
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-/* Modern Player Layout - Udemy Clone Exact */
+/* Modern Player Layout - LearnIt Exact */
 .player-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  font-family: 'Udemy Sans', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  font-family: 'LearnIt Sans', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
   background-color: #fff;
   overflow: hidden;
 }
@@ -484,7 +484,7 @@ html {
   background: transparent;
   color: #fff;
   border: 1px solid #fff;
-  /* Button border default white in Udemy player */
+  /* Button border default white in LearnIt player */
   padding: 0 1.2rem;
   height: 3.4rem;
   font-weight: 700;

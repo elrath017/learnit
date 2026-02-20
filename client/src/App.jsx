@@ -67,7 +67,7 @@ const getCourseMetadata = (courseName) => {
     rating,
     reviewCount: reviewCount.toLocaleString(),
     currentPrice: `₹${price}`,
-    originalPrice: `₹${price * 4}`, // Udemy usually has huge "original" prices
+    originalPrice: `₹${price * 4}`, // LearnIt usually has huge "original" prices
     instructor: "Dr. Angela Yu, Developer and Lead Instructor", // Mocked common instructor
     details: "Become a Full-Stack Web Developer with just one course. HTML, CSS, Javascript, Node, React, MongoDB, Web3 and DApps", // Mock description
     isBestseller,
@@ -91,10 +91,10 @@ function App() {
     }
   });
   const [showSettings, setShowSettings] = useState(false);
-  const [rootDir, setRootDir] = useState(() => localStorage.getItem('udemy_clone_root_path') || 'E:\\Rahul\\Courses');
+  const [rootDir, setRootDir] = useState(() => localStorage.getItem('learnit_clone_root_path') || 'E:\\Rahul\\Courses');
   const [pathHistory, setPathHistory] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem('udemy_clone_path_history') || '[]');
+      return JSON.parse(localStorage.getItem('learnit_clone_path_history') || '[]');
     } catch {
       return [];
     }
@@ -166,10 +166,10 @@ function App() {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          localStorage.setItem('udemy_clone_root_path', rootDir);
+          localStorage.setItem('learnit_clone_root_path', rootDir);
           setPathHistory(prev => {
             const newHistory = [rootDir, ...prev.filter(p => p !== rootDir)].slice(0, 5);
-            localStorage.setItem('udemy_clone_path_history', JSON.stringify(newHistory));
+            localStorage.setItem('learnit_clone_path_history', JSON.stringify(newHistory));
             return newHistory;
           });
           setShowSettings(false);
@@ -218,9 +218,9 @@ function App() {
   return (
     <div className="app-container">
       <nav className="navbar">
-        {/* Reuse previous logic or simplify for "Udemy" look */}
+        {/* Reuse previous logic or simplify for "LearnIt" look */}
         <div style={{ display: 'flex', alignItems: 'center', height: '7.2rem', gap: '2rem' }}>
-          <img src="https://www.udemy.com/staticx/udemy/images/v7/logo-udemy.svg" alt="Udemy" style={{ height: '3.2rem' }} />
+          <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#2d2f31', fontFamily: 'sans-serif' }}>LearnIt</div>
           <div className="search-bar" style={{ flex: 1, maxWidth: '60rem', border: '1px solid #1c1d1f', borderRadius: '4rem', height: '4.8rem', display: 'flex', alignItems: 'center', padding: '0 1.6rem', gap: '1rem', background: '#f7f9fa' }}>
             <Search size={20} color="#6a6f73" />
             <input placeholder="Search for anything" style={{ border: 'none', background: 'transparent', width: '100%', fontSize: '1.4rem', outline: 'none' }} />
@@ -623,13 +623,13 @@ const advancedSort = (a, b) => {
   return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
 };
 
-// --- Player Component (Refactored for Udemy-like Layout) ---
+// --- Player Component (Refactored for LearnIt-like Layout) ---
 const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, sidebarOpen, setSidebarOpen }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedFolders, setExpandedFolders] = useState({});
   const [completedVideos, setCompletedVideos] = useState(() => {
     try {
-      const stored = localStorage.getItem('udemy_clone_completed_videos');
+      const stored = localStorage.getItem('learnit_clone_completed_videos');
       return stored ? new Set(JSON.parse(stored)) : new Set();
     } catch {
       return new Set();
@@ -637,7 +637,7 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
   });
 
   useEffect(() => {
-    localStorage.setItem('udemy_clone_completed_videos', JSON.stringify([...completedVideos]));
+    localStorage.setItem('learnit_clone_completed_videos', JSON.stringify([...completedVideos]));
   }, [completedVideos]);
   const [showNextOverlay, setShowNextOverlay] = useState(false);
   const [flatPlaylist, setFlatPlaylist] = useState([]);
@@ -725,7 +725,7 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
       {/* Dark Header */}
       <header className="player-header">
         <div className="player-header-left">
-          <img src="https://www.udemy.com/staticx/udemy/images/v7/logo-udemy-inverted.svg" alt="Udemy" style={{ height: '3.2rem', cursor: 'pointer' }} onClick={onBack} />
+          <div style={{ fontSize: '2.4rem', fontWeight: 800, color: '#fff', cursor: 'pointer', fontFamily: 'sans-serif' }} onClick={onBack}>LearnIt</div>
           <div className="player-header-title">
             {course.name}
           </div>
