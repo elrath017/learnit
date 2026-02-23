@@ -51,18 +51,18 @@ const getDirectoryStructure = (dirPath, rootPath) => {
             // Skip hidden files
             if (item.startsWith('.')) return;
 
-            // Skip unwanted links
-            const lowerItem = item.toLowerCase();
-            if (lowerItem.includes('[courseclub.me]') || lowerItem.includes('[fcsnew.net]')) {
-                return;
-            }
-
             const fullPath = path.join(dirPath, item);
             let stats;
             try {
                 stats = fs.statSync(fullPath);
             } catch (e) {
                 return; // Skip if cant read
+            }
+
+            // Skip unwanted links (only if it's a file)
+            const lowerItem = item.toLowerCase();
+            if (stats.isFile() && (lowerItem.includes('[courseclub.me]') || lowerItem.includes('[fcsnew.net]'))) {
+                return;
             }
 
             // Calculate relative path from the *configured root*
