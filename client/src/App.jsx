@@ -321,10 +321,23 @@ function App() {
               }
             }}>
               <div className="cl-thumbnail" style={{ background: '#2d2f31' }}>
-                {/* Placeholder for video thumbnail, usually last frame */}
-                <div style={{ color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <Play fill="white" size={48} />
-                </div>
+                {(() => {
+                  const currentCourse = courses.find(c => c.name === lastWatched.courseName);
+                  if (currentCourse && currentCourse.thumbnailPath) {
+                    return (
+                      <img
+                        src={`${API_URL}/video?path=${encodeURIComponent(currentCourse.thumbnailPath)}`}
+                        alt="Thumbnail"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    );
+                  }
+                  return (
+                    <div style={{ color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <Play fill="white" size={48} />
+                    </div>
+                  );
+                })()}
               </div>
               <div className="cl-info">
                 <span className="cl-meta" style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.4rem', color: '#6a6f73' }}>
@@ -346,12 +359,20 @@ function App() {
               {courses.map(course => (
                 <div key={course.name} className="course-card-new" onClick={() => handleCourseSelect(course)}>
                   <div className="cc-thumbnail">
-                    <div className="cc-placeholder" style={{ background: course.color }}>
-                      {/* Mock Course Image Gradient */}
-                      <span style={{ fontWeight: 700, fontSize: '2rem', padding: '1rem', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-                        {course.name.substring(0, 2).toUpperCase()}
-                      </span>
-                    </div>
+                    {course.thumbnailPath ? (
+                      <img
+                        src={`${API_URL}/video?path=${encodeURIComponent(course.thumbnailPath)}`}
+                        alt={course.name}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div className="cc-placeholder" style={{ background: course.color }}>
+                        {/* Mock Course Image Gradient */}
+                        <span style={{ fontWeight: 700, fontSize: '2rem', padding: '1rem', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                          {course.name.substring(0, 2).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="cc-details">
                     <h3 className="cc-title">{course.name}</h3>

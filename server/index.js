@@ -51,6 +51,12 @@ const getDirectoryStructure = (dirPath, rootPath) => {
             // Skip hidden files
             if (item.startsWith('.')) return;
 
+            // Skip unwanted links
+            const lowerItem = item.toLowerCase();
+            if (lowerItem.includes('[courseclub.me]') || lowerItem.includes('[fcsnew.net]')) {
+                return;
+            }
+
             const fullPath = path.join(dirPath, item);
             let stats;
             try {
@@ -63,11 +69,18 @@ const getDirectoryStructure = (dirPath, rootPath) => {
             const relativePath = path.relative(rootPath, fullPath).replace(/\\/g, '/');
 
             if (stats.isDirectory()) {
+                const children = getDirectoryStructure(fullPath, rootPath);
+
+                // Find a thumbnail image for this directory
+                const thumbnailChild = children.find(c => c.type === 'file' && c.name.toLowerCase().startsWith('thumbnail.'));
+                const filteredChildren = children.filter(c => !(c.type === 'file' && c.name.toLowerCase().startsWith('thumbnail.')));
+
                 structure.push({
                     type: 'directory',
                     name: item,
                     path: relativePath,
-                    children: getDirectoryStructure(fullPath, rootPath)
+                    children: filteredChildren,
+                    thumbnailPath: thumbnailChild ? thumbnailChild.path : null
                 });
             } else {
                 structure.push({
@@ -197,7 +210,12 @@ app.get('/api/video', (req, res) => {
         '.txt': 'text/plain',
         '.md': 'text/markdown',
         '.zip': 'application/zip',
-        '.rar': 'application/x-rar-compressed'
+        '.rar': 'application/x-rar-compressed',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.webp': 'image/webp',
+        '.gif': 'image/gif'
     };
     const contentType = mimeTypes[ext] || 'application/octet-stream';
 
