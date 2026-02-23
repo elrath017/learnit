@@ -126,18 +126,7 @@ function App() {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          fetchCourses().then((enriched) => {
-            if (enriched && lastWatched) {
-              const course = enriched.find(c => c.name === lastWatched.courseName);
-              if (course) {
-                setSelectedCourse(course);
-                setCurrentVideo({
-                  name: lastWatched.videoName,
-                  path: lastWatched.videoPath
-                });
-              }
-            }
-          });
+          fetchCourses();
         } else {
           console.error("Default path invalid or not found:", data.error);
         }
@@ -320,20 +309,25 @@ function App() {
                 });
               }
             }}>
-              <div className="cl-thumbnail" style={{ background: '#2d2f31' }}>
+              <div className="cl-thumbnail" style={{ background: '#2d2f31', position: 'relative' }}>
                 {(() => {
                   const currentCourse = courses.find(c => c.name === lastWatched.courseName);
                   if (currentCourse && currentCourse.thumbnailPath) {
                     return (
-                      <img
-                        src={`${API_URL}/video?path=${encodeURIComponent(currentCourse.thumbnailPath)}`}
-                        alt="Thumbnail"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+                      <>
+                        <img
+                          src={`${API_URL}/video?path=${encodeURIComponent(currentCourse.thumbnailPath)}`}
+                          alt="Thumbnail"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                          <Play fill="white" color="white" size={48} />
+                        </div>
+                      </>
                     );
                   }
                   return (
-                    <div style={{ color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
                       <Play fill="white" size={48} />
                     </div>
                   );
