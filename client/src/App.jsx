@@ -434,6 +434,40 @@ const CustomVideoPlayer = ({ src, onTimeUpdate, onEnded, autoPlay, children }) =
     }
   }, [volume, isMuted]);
 
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+        return;
+      }
+      
+      if (!videoRef.current) return;
+
+      switch (e.key) {
+        case 'ArrowRight':
+          e.preventDefault();
+          videoRef.current.currentTime = Math.min(videoRef.current.duration, videoRef.current.currentTime + 5);
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 5);
+          break;
+        case ' ':
+          e.preventDefault();
+          if (videoRef.current.paused) {
+            videoRef.current.play();
+            setPlaying(true);
+          } else {
+            videoRef.current.pause();
+            setPlaying(false);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const togglePlay = () => {
     if (videoRef.current) {
       if (playing) {
