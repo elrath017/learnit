@@ -83,13 +83,8 @@ function App() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [currentVideo, setCurrentVideo] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [lastWatched, setLastWatched] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('lastWatched') || 'null');
-    } catch {
-      return null;
-    }
-  });
+  const [lastWatched, setLastWatched] = useState(null);
+  const [completedVideos, setCompletedVideos] = useState(new Set());
   const [showSettings, setShowSettings] = useState(false);
   const [rootDir, setRootDir] = useState(() => localStorage.getItem('learnit_clone_root_path') || 'E:\\Rahul\\Courses');
   const [pathHistory, setPathHistory] = useState(() => {
@@ -127,6 +122,14 @@ function App() {
       .then(data => {
         if (data.success) {
           fetchCourses();
+          
+          fetch(`${API_URL}/progress`)
+            .then(res => res.json())
+            .then(prog => {
+              if (prog.lastWatched) setLastWatched(prog.lastWatched);
+              if (prog.completedVideos) setCompletedVideos(new Set(prog.completedVideos));
+            })
+            .catch(e => console.error("Failed to fetch progress", e));
         } else {
           console.error("Default path invalid or not found:", data.error);
         }
@@ -175,6 +178,17 @@ function App() {
     setSelectedCourse(course);
   };
 
+  const syncProgress = (newLast, newCompleted) => {
+    fetch(`${API_URL}/progress`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lastWatched: newLast || lastWatched,
+        completedVideos: Array.from(newCompleted || completedVideos)
+      })
+    }).catch(e => console.error("Failed to save progress", e));
+  };
+
   const handleVideoSelect = (video, course) => {
     setCurrentVideo(video);
     // Save last watched
@@ -185,7 +199,7 @@ function App() {
       timestamp: Date.now()
     };
     setLastWatched(record);
-    localStorage.setItem('lastWatched', JSON.stringify(record));
+    syncProgress(record, completedVideos);
   };
 
 
@@ -199,6 +213,10 @@ function App() {
         onBack={() => { setSelectedCourse(null); setCurrentVideo(null); }}
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
+        completedVideos={completedVideos}
+        setCompletedVideos={setCompletedVideos}
+        syncProgress={syncProgress}
+        lastWatched={lastWatched}
       />
     );
   }
@@ -673,21 +691,9 @@ const advancedSort = (a, b) => {
 };
 
 // --- Player Component (Refactored for LearnIt-like Layout) ---
-const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, sidebarOpen, setSidebarOpen }) => {
+const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, sidebarOpen, setSidebarOpen, completedVideos, setCompletedVideos, syncProgress, lastWatched }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedFolders, setExpandedFolders] = useState({});
-  const [completedVideos, setCompletedVideos] = useState(() => {
-    try {
-      const stored = localStorage.getItem('learnit_clone_completed_videos');
-      return stored ? new Set(JSON.parse(stored)) : new Set();
-    } catch {
-      return new Set();
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem('learnit_clone_completed_videos', JSON.stringify([...completedVideos]));
-  }, [completedVideos]);
   const [showNextOverlay, setShowNextOverlay] = useState(false);
   const [flatPlaylist, setFlatPlaylist] = useState([]);
 
@@ -756,7 +762,9 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
 
     // Tick checkbox in last 5 seconds
     if (remaining <= 5 && !completedVideos.has(currentVideo.path)) {
-      setCompletedVideos(prev => new Set(prev).add(currentVideo.path));
+      const newCompleted = new Set(completedVideos).add(currentVideo.path);
+      setCompletedVideos(newCompleted);
+      syncProgress(lastWatched, newCompleted);
     }
 
     // Show next overlay in last 3 seconds

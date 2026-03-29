@@ -276,6 +276,34 @@ app.get('/api/duration', (req, res) => {
     });
 });
 
+// APIs for course progress history tied to the course folder
+app.get('/api/progress', (req, res) => {
+    const config = getConfig();
+    const progressPath = path.join(config.rootDir, 'learnit-progress.json');
+    if (fs.existsSync(progressPath)) {
+        try {
+            const data = fs.readFileSync(progressPath, 'utf8');
+            return res.json(JSON.parse(data));
+        } catch (e) {
+            console.error('Failed to read progress:', e);
+            return res.json({});
+        }
+    }
+    return res.json({});
+});
+
+app.post('/api/progress', (req, res) => {
+    const config = getConfig();
+    const progressPath = path.join(config.rootDir, 'learnit-progress.json');
+    try {
+        fs.writeFileSync(progressPath, JSON.stringify(req.body, null, 2));
+        res.json({ success: true });
+    } catch (e) {
+        console.error('Failed to write progress:', e);
+        res.status(500).json({ error: 'Failed to write progress' });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     const config = getConfig();
