@@ -768,7 +768,28 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
       const newCompleted = new Set(completedVideos);
       flatPlaylist.forEach(v => newCompleted.delete(v.path));
       setCompletedVideos(newCompleted);
-      syncProgress(lastWatched, newCompleted);
+
+      let newRecord = lastWatched;
+
+      if (flatPlaylist.length > 0) {
+        const firstVideo = flatPlaylist[0];
+        
+        // Push the player exactly to the start
+        setCurrentVideo({ ...firstVideo, timeToResume: 0 });
+        
+        // Completely overwrite the save file record with 0 time
+        newRecord = {
+          courseName: course.name,
+          videoName: firstVideo.name,
+          videoPath: firstVideo.path,
+          timestamp: Date.now(),
+          videoTime: 0
+        };
+        setLastWatched(newRecord);
+        window.lastTimeSync = 0; // Reset global throttler
+      }
+
+      syncProgress(newRecord, newCompleted);
     }
   };
 
