@@ -50,6 +50,9 @@ const getDirectoryStructure = (dirPath, rootPath) => {
         items.forEach(item => {
             // Skip hidden files
             if (item.startsWith('.')) return;
+            
+            // Skip our internal progress file so it doesn't render in the UI
+            if (item === 'learnit-progress.json') return;
 
             const fullPath = path.join(dirPath, item);
             let stats;
