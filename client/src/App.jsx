@@ -755,6 +755,19 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
     }
   };
 
+  const handleRestartCourse = () => {
+    if (window.confirm("Are you sure you want to completely clear your progress for this course?")) {
+      const newCompleted = new Set(completedVideos);
+      flatPlaylist.forEach(v => newCompleted.delete(v.path));
+      setCompletedVideos(newCompleted);
+      syncProgress(lastWatched, newCompleted);
+    }
+  };
+
+  const courseTotalVideos = flatPlaylist.length;
+  const courseCompletedVideos = flatPlaylist.filter(v => completedVideos.has(v.path)).length;
+  const progressPercentage = courseTotalVideos === 0 ? 0 : Math.round((courseCompletedVideos / courseTotalVideos) * 100);
+
   const handleTimeUpdate = (e) => {
     const { currentTime, duration } = e.target;
     if (!duration || !currentVideo) return;
@@ -793,8 +806,12 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
           </div>
 
           <div className="header-btn-dark">
-            <Trophy size={16} /> Your progress
+            <Trophy size={16} /> {courseCompletedVideos} / {courseTotalVideos} ({progressPercentage}%)
           </div>
+
+          <button className="header-btn-dark" onClick={handleRestartCourse} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid #d1d7dc' }}>
+            <RotateCcw size={16} /> Restart Course
+          </button>
 
           <button className="header-btn-dark">
             Share <Share2 size={16} />
