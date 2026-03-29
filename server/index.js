@@ -62,9 +62,10 @@ const getDirectoryStructure = (dirPath, rootPath) => {
                 return; // Skip if cant read
             }
 
-            // Skip unwanted links (only if it's a file)
+            // Skip unwanted links (only if it's a file, and NEVER skip actual video files!)
             const lowerItem = item.toLowerCase();
-            if (stats.isFile() && (lowerItem.includes('[courseclub.me]') || lowerItem.includes('[fcsnew.net]'))) {
+            const isPromo = lowerItem.includes('[courseclub.me]') || lowerItem.includes('[fcsnew.net]');
+            if (stats.isFile() && isPromo && !lowerItem.match(/\.(mp4|mkv|webm|ogg|mov|avi)$/)) {
                 return;
             }
 

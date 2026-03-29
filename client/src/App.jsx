@@ -196,7 +196,8 @@ function App() {
       courseName: course.name,
       videoName: video.name,
       videoPath: video.path,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      videoTime: 0
     };
     setLastWatched(record);
     syncProgress(record, completedVideos);
@@ -217,6 +218,7 @@ function App() {
         setCompletedVideos={setCompletedVideos}
         syncProgress={syncProgress}
         lastWatched={lastWatched}
+        setLastWatched={setLastWatched}
       />
     );
   }
@@ -319,12 +321,15 @@ function App() {
             <h2>What to learn next</h2>
             <div className="continue-learning-card" onClick={() => {
               const course = courses.find(c => c.name === lastWatched.courseName);
-              if (course) {
+              if (course && lastWatched.videoPath) {
                 setSelectedCourse(course);
                 setCurrentVideo({
                   name: lastWatched.videoName,
-                  path: lastWatched.videoPath
+                  path: lastWatched.videoPath,
+                  timeToResume: lastWatched.videoTime || 0
                 });
+              } else {
+                alert("This progress data is corrupted; please select the specific section from the course library to reset your starting point!");
               }
             }}>
               <div className="cl-thumbnail" style={{ background: '#2d2f31', position: 'relative' }}>
@@ -418,7 +423,7 @@ function App() {
 }
 
 // --- Custom Video Player Component ---
-const CustomVideoPlayer = ({ src, onTimeUpdate, onEnded, autoPlay, children }) => {
+const CustomVideoPlayer = ({ src, onTimeUpdate, onEnded, autoPlay, children, initialTime }) => {
   const videoRef = React.useRef(null);
   const [playing, setPlaying] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
@@ -432,6 +437,9 @@ const CustomVideoPlayer = ({ src, onTimeUpdate, onEnded, autoPlay, children }) =
 
   React.useEffect(() => {
     if (videoRef.current) {
+      if (initialTime && initialTime > 0) {
+        videoRef.current.currentTime = initialTime;
+      }
       if (autoPlay) {
         videoRef.current.play().catch(() => { });
         setPlaying(true);
@@ -691,7 +699,7 @@ const advancedSort = (a, b) => {
 };
 
 // --- Player Component (Refactored for LearnIt-like Layout) ---
-const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, sidebarOpen, setSidebarOpen, completedVideos, setCompletedVideos, syncProgress, lastWatched }) => {
+const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, sidebarOpen, setSidebarOpen, completedVideos, setCompletedVideos, syncProgress, lastWatched, setLastWatched }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedFolders, setExpandedFolders] = useState({});
   const [showNextOverlay, setShowNextOverlay] = useState(false);
@@ -780,6 +788,23 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
       syncProgress(lastWatched, newCompleted);
     }
 
+    // Save timestamp history every 5 seconds to reduce API load
+    if (Math.floor(currentTime) % 5 === 0 && Math.floor(currentTime) > 0) {
+      if (!window.lastTimeSync || Math.abs(currentTime - window.lastTimeSync) >= 5) {
+        window.lastTimeSync = currentTime;
+        const newRecord = {
+          ...lastWatched,
+          courseName: course.name,
+          videoName: currentVideo.name,
+          videoPath: currentVideo.path,
+          timestamp: Date.now(),
+          videoTime: currentTime
+        };
+        setLastWatched(newRecord);
+        syncProgress(newRecord, undefined);
+      }
+    }
+
     // Show next overlay in last 3 seconds
     if (remaining <= 3 && !showNextOverlay) {
       // Only show if there is a next video
@@ -834,6 +859,7 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={playNextVideo}
                 autoPlay={true}
+                initialTime={currentVideo.timeToResume || 0}
               >
                 {showNextOverlay && (
                   <div style={{
