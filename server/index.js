@@ -165,7 +165,8 @@ app.get('/api/courses', (req, res) => {
         }
 
         const structure = getDirectoryStructure(config.rootDir, config.rootDir);
-        res.json(structure);
+        const foldersOnly = structure.filter(item => item.type === 'directory');
+        res.json(foldersOnly);
     } catch (error) {
         console.error('Error scanning directory:', error);
         res.status(500).json({ error: 'Failed to scan courses directory' });

@@ -797,16 +797,10 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
       flatPlaylist.forEach(v => newCompleted.delete(v.path));
       setCompletedVideos(newCompleted);
 
-      let newRecord = lastWatched;
-
       if (flatPlaylist.length > 0) {
         const firstVideo = flatPlaylist[0];
-        
-        // Push the player exactly to the start
         setCurrentVideo({ ...firstVideo, timeToResume: 0 });
-        
-        // Completely overwrite the save file record with 0 time
-        newRecord = {
+        const newRecord = {
           courseName: course.name,
           videoName: firstVideo.name,
           videoPath: firstVideo.path,
@@ -814,11 +808,43 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
           videoTime: 0
         };
         setLastWatched(newRecord);
-        window.lastTimeSync = 0; // Reset global throttler
+        window.lastTimeSync = 0;
       }
-
-      syncProgress(newRecord, newCompleted);
+      // Does NOT call syncProgress — changes stay in browser only until Save is clicked
     }
+  };
+
+  const [showProgressPanel, setShowProgressPanel] = React.useState(false);
+  const [statusMsg, setStatusMsg] = React.useState(null); // { text, color }
+
+  const showStatus = (text, color) => {
+    setStatusMsg({ text, color });
+    setTimeout(() => setStatusMsg(null), 2500);
+  };
+
+  const handleSaveProgress = () => {
+    syncProgress(lastWatched, completedVideos);
+    showStatus('✓ Saved', '#22c55e');
+  };
+
+  const handleRecoverProgress = () => {
+    fetch(`${API_URL}/progress`)
+      .then(res => res.json())
+      .then(prog => {
+        if (prog.completedVideos) setCompletedVideos(new Set(prog.completedVideos));
+        if (prog.lastWatched) {
+          setLastWatched(prog.lastWatched);
+          if (prog.lastWatched.courseName === course.name && prog.lastWatched.videoPath) {
+            setCurrentVideo({
+              name: prog.lastWatched.videoName,
+              path: prog.lastWatched.videoPath,
+              timeToResume: prog.lastWatched.videoTime || 0
+            });
+          }
+        }
+        showStatus('✓ Recovered', '#22c55e');
+      })
+      .catch(() => showStatus('✗ Recover failed', '#ef4444'));
   };
 
   const courseTotalVideos = flatPlaylist.length;
@@ -830,14 +856,13 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
     if (!duration || !currentVideo) return;
     const remaining = duration - currentTime;
 
-    // Tick checkbox in last 5 seconds
+    // Tick checkbox in last 5 seconds (saved in browser state only)
     if (remaining <= 5 && !completedVideos.has(currentVideo.path)) {
       const newCompleted = new Set(completedVideos).add(currentVideo.path);
       setCompletedVideos(newCompleted);
-      syncProgress(lastWatched, newCompleted);
     }
 
-    // Save timestamp history every 5 seconds to reduce API load
+    // Track current time in state only (no auto-save to JSON)
     if (Math.floor(currentTime) % 5 === 0 && Math.floor(currentTime) > 0) {
       if (!window.lastTimeSync || Math.abs(currentTime - window.lastTimeSync) >= 5) {
         window.lastTimeSync = currentTime;
@@ -850,7 +875,7 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
           videoTime: currentTime
         };
         setLastWatched(newRecord);
-        syncProgress(newRecord, undefined);
+        // NOT calling syncProgress here — user must click Save
       }
     }
 
@@ -879,13 +904,77 @@ const VideoPlayerLayout = ({ course, currentVideo, setCurrentVideo, onBack, side
             <Star size={16} fill="#fff" /> Leave a rating
           </div>
 
-          <div className="header-btn-dark">
-            <Trophy size={16} /> {courseCompletedVideos} / {courseTotalVideos} ({progressPercentage}%)
-          </div>
+          {/* Your Progress Button + Panel */}
+          <div style={{ position: 'relative' }}>
+            <button
+              className="header-btn-dark"
+              onClick={() => setShowProgressPanel(p => !p)}
+              style={{ border: '2px solid #a435f0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              <Trophy size={16} /> Your progress
+            </button>
 
-          <button className="header-btn-dark" onClick={handleRestartCourse} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid #d1d7dc' }}>
-            <RotateCcw size={16} /> Restart Course
-          </button>
+            {showProgressPanel && (
+              <div style={{
+                position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                background: '#1c1d1f', border: '1px solid #3e4143', borderRadius: '8px',
+                padding: '2rem', minWidth: '320px', zIndex: 200,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
+              }}>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.6rem' }}>
+                  <span style={{ color: '#fff', fontWeight: 700, fontSize: '1.8rem' }}>Your Progress</span>
+                  <button onClick={() => setShowProgressPanel(false)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer' }}>
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Count + Percentage */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                  <span style={{ color: '#d1d7dc', fontSize: '1.4rem' }}>{courseCompletedVideos} / {courseTotalVideos} lectures</span>
+                  <span style={{ color: '#a435f0', fontWeight: 700, fontSize: '1.6rem' }}>{progressPercentage}%</span>
+                </div>
+
+                {/* Progress Bar */}
+                <div style={{ height: '6px', background: '#3e4143', borderRadius: '3px', marginBottom: '0.8rem', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${progressPercentage}%`, background: '#a435f0', borderRadius: '3px', transition: 'width 0.3s' }} />
+                </div>
+                <p style={{ color: '#6a6f73', fontSize: '1.2rem', marginBottom: '2rem' }}>{courseTotalVideos - courseCompletedVideos} lectures remaining</p>
+
+                {/* Save & Recover */}
+                {statusMsg && (
+                  <div style={{ textAlign: 'center', fontWeight: 700, fontSize: '1.4rem', color: statusMsg.color, marginBottom: '0.8rem', transition: 'all 0.3s' }}>
+                    {statusMsg.text}
+                  </div>
+                )}
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                  <button onClick={handleSaveProgress} style={{
+                    flex: 1, padding: '1rem', background: '#a435f0', color: '#fff',
+                    border: 'none', borderRadius: '4px', fontWeight: 700, fontSize: '1.4rem',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
+                  }}>
+                    💾 Save
+                  </button>
+                  <button onClick={handleRecoverProgress} style={{
+                    flex: 1, padding: '1rem', background: '#2d2f31', color: '#fff',
+                    border: '1px solid #3e4143', borderRadius: '4px', fontWeight: 700, fontSize: '1.4rem',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
+                  }}>
+                    📂 Recover
+                  </button>
+                </div>
+
+                {/* Restart */}
+                <button onClick={() => { handleRestartCourse(); setShowProgressPanel(false); }} style={{
+                  width: '100%', padding: '1rem', background: 'transparent', color: '#a435f0',
+                  border: '1px solid #a435f0', borderRadius: '4px', fontWeight: 700, fontSize: '1.4rem',
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
+                }}>
+                  <RotateCcw size={16} /> Restart Course
+                </button>
+              </div>
+            )}
+          </div>
 
           <button className="header-btn-dark">
             Share <Share2 size={16} />
