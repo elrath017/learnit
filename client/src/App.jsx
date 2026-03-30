@@ -176,6 +176,34 @@ function App() {
 
   const handleCourseSelect = (course) => {
     setSelectedCourse(course);
+
+    // Auto-start: try to resume last watched video for this course
+    if (lastWatched && lastWatched.courseName === course.name && lastWatched.videoPath) {
+      setCurrentVideo({
+        name: lastWatched.videoName,
+        path: lastWatched.videoPath,
+        timeToResume: lastWatched.videoTime || 0
+      });
+    } else {
+      // Otherwise auto-play the first video in the course
+      const findFirstVideo = (items) => {
+        if (!items) return null;
+        const sorted = [...items].sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+        );
+        for (const item of sorted) {
+          if (item.type === 'directory') {
+            const found = findFirstVideo(item.children);
+            if (found) return found;
+          } else if (item.name.match(/\.(mp4|mkv|webm|ogg|mov|avi)$/i)) {
+            return item;
+          }
+        }
+        return null;
+      };
+      const firstVideo = findFirstVideo(course.children);
+      if (firstVideo) setCurrentVideo({ ...firstVideo, timeToResume: 0 });
+    }
   };
 
   const syncProgress = (newLast, newCompleted) => {
